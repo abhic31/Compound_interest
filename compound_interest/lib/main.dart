@@ -9,8 +9,9 @@ class CompoundInterestApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Traders  Compound Interest Calculator',
+      title: 'Traders Compound Interest Calculator',
       theme: ThemeData(primarySwatch: Colors.blue),
+      debugShowCheckedModeBanner: false,
       home: CalculatorScreen(),
     );
   }
