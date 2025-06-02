@@ -7,51 +7,79 @@ class ResultTable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return result.isEmpty
-        ? Center(
-            child: Text(
-              'No results to display',
-              style: TextStyle(fontSize: 16),
+    // Calculate totals
+    double totalInterest = 0;
+    double totalSum = 0;
+
+    for (var row in result) {
+      totalInterest += double.tryParse(row['interest'].toString()) ?? 0;
+      totalSum += double.tryParse(row['sum'].toString()) ?? 0;
+    }
+
+    // Total header widget
+    Widget totalDisplay(String label) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          child: Text(
+            '💰 $label: ${totalInterest.toStringAsFixed(2)}',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+        );
+
+    if (result.isEmpty) {
+      return Center(
+        child: Text(
+          'No results to display',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Top total display
+          totalDisplay('Total Earned'),
+
+          // Scrollable table
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: DataTable(
+              columns: const [
+                DataColumn(label: Text('Trade Number')),
+                DataColumn(label: Text('Interest Earned')),
+                DataColumn(label: Text('Total Amount')),
+              ],
+              rows: [
+                ...result.map(
+                  (row) => DataRow(
+                    cells: [
+                      DataCell(Text(row['trade'].toString())),
+                      DataCell(Text(row['interest'].toString())),
+                      DataCell(Text(row['sum'].toString())),
+                    ],
+                  ),
+                ),
+                DataRow(
+                  cells: [
+                    DataCell(Text(
+                      '💰 Total Earned',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                    DataCell(Text(
+                      totalInterest.toStringAsFixed(2),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                    DataCell(Text(
+                      totalSum.toStringAsFixed(2),
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    )),
+                  ],
+                ),
+              ],
             ),
-          )
-        : SingleChildScrollView(
-            scrollDirection: Axis.horizontal, // <-- horizontal scroll
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical, // <-- vertical scroll
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                    label: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Trade Number', textAlign: TextAlign.center),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Interest Earned', textAlign: TextAlign.center),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Total Amount', textAlign: TextAlign.center),
-                    ),
-                  ),
-                ],
-                rows: result
-                    .map(
-                      (row) => DataRow(
-                        cells: [
-                          DataCell(Text(row['trade'].toString())),
-                          DataCell(Text(row['interest'])),
-                          DataCell(Text(row['sum'])),
-                        ],
-                      ),
-                    )
-                    .toList(),
-              ),
-            ),
-          );
+          ),
+        ],
+      ),
+    );
   }
 }
